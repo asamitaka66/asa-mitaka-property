@@ -10,6 +10,252 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
    <link rel="preconnect" href="https://fonts.googleapis.com">
+<script>
+(() => {
+
+  const API_BASE = "https://asa-mitaka-property.up.railway.app";
+
+  const $ = (id) => document.getElementById(id);
+
+  // ===== Elements =====
+  const adminModal = $("adminModal");
+  const adminKeyInput = $("adminKeyInput");
+  const adminSaveBtn = $("adminSaveBtn");
+  const adminModalClose = $("adminModalClose");
+  const logoutBtn = $("logoutBtn");
+
+  const openGenerateBtn = $("openGenerateBtn");
+  const genModal = $("genModal");
+  const genCloseBtn = $("genCloseBtn");
+  const genDoBtn = $("genDoBtn");
+  const copyKeyBtn = $("copyKeyBtn");
+
+  const durAmount = $("durAmount");
+  const durUnit = $("durUnit");
+  const durPreview = $("durPreview");
+  const generatedKey = $("generatedKey");
+
+  // nav
+  const navItems = Array.from(document.querySelectorAll(".navItem"));
+  const pageUsers = $("page-users");
+  const pageKeys = $("page-keys");
+
+  // ===== Helpers =====
+  function getAdminKey() {
+    return localStorage.getItem("ADMIN_KEY") || "";
+  }
+  function setAdminKey(v) {
+    localStorage.setItem("ADMIN_KEY", v);
+  }
+  function clearAdminKey() {
+    localStorage.removeItem("ADMIN_KEY");
+  }
+
+  function show(el) { el.classList.remove("hidden"); }
+  function hide(el) { el.classList.add("hidden"); }
+
+  function headersAdmin() {
+    return {
+      "Content-Type": "application/json",
+      "X-Admin-Key": getAdminKey(),
+    };
+  }
+
+  function toast(title, msg) {
+    // lightweight: use alert for now (you can replace with your toast UI)
+    console.log(`[${title}] ${msg}`);
+  }
+
+  function clampDurationToMaxSeconds(seconds) {
+    const max = 10 * 365 * 24 * 60 * 60; // 10 years
+    if (seconds < 1) return 1;
+    if (seconds > max) return max;
+    return seconds;
+  }
+
+  function unitToSeconds(amount, unit) {
+    const a = Math.max(1, Number(amount || 1));
+    switch (unit) {
+      case "seconds": return a;
+      case "minutes": return a * 60;
+      case "hours":   return a * 60 * 60;
+      case "days":    return a * 24 * 60 * 60;
+      case "months":  return a * 30 * 24 * 60 * 60;
+      case "years":   return a * 365 * 24 * 60 * 60;
+      default:        return a * 60 * 60;
+    }
+  }
+
+  function prettyDuration(seconds) {
+    // simple readable preview
+    if (seconds < 60) return `${seconds} seconds`;
+    const minutes = Math.round(seconds / 60);
+    if (minutes < 60) return `${minutes} minutes`;
+    const hours = Math.round(seconds / 3600);
+    if (hours < 24) return `${hours} hours`;
+    const days = Math.round(seconds / 86400);
+    if (days < 30) return `${days} days`;
+    const months = Math.round(seconds / (30 * 86400));
+    if (months < 12) return `${months} months`;
+    const years = (seconds / (365 * 86400)).toFixed(2);
+    return `${years} years`;
+  }
+
+  function updateDurationPreview() {
+    const secs = clampDurationToMaxSeconds(unitToSeconds(durAmount.value, durUnit.value));
+    durPreview.textContent = `${prettyDuration(secs)} (${secs.toLocaleString()} seconds)`;
+  }
+
+  // ===== Admin modal behavior =====
+  async function validateAdminKey(key) {
+    // Best practice: have a dedicated /admin/ping endpoint.
+    // For now we just try an admin endpoint and accept "not 401" as valid.
+    try {
+      const res = await fetch(`${API_BASE}/api/license/ping-admin`, {
+        method: "GET",
+        headers: { "X-Admin-Key": key }
+      });
+
+      if (res.status === 404) {
+        // If you don't have ping route yet, we can't validate here.
+        // We'll treat it as "saved" and rely on real calls later.
+        return true;
+      }
+      return res.status !== 401;
+    } catch {
+      // Backend offline: still allow saving key; dashboard actions will fail until backend is up
+      return true;
+    }
+  }
+
+  async function onSaveAdmin() {
+    const key = (adminKeyInput.value || "").trim();
+    if (!key) {
+      alert("Enter your ADMIN_KEY.");
+      return;
+    }
+
+    const ok = await validateAdminKey(key);
+    if (!ok) {
+      alert("Invalid ADMIN_KEY (server returned 401).");
+      return;
+    }
+
+    setAdminKey(key);
+    hide(adminModal); // ✅ this is what you expected
+    toast("Admin", "Key saved");
+  }
+
+  function onLogout() {
+    clearAdminKey();
+    show(adminModal);
+    adminKeyInput.value = "";
+    toast("Admin", "Logged out");
+  }
+
+  // ===== Generate modal behavior =====
+  function openGen() {
+    generatedKey.value = "";
+    updateDurationPreview();
+    show(genModal);
+  }
+
+  function closeGen() {
+    hide(genModal);
+  }
+
+  async function doGenerate() {
+    const adminKey = getAdminKey();
+    if (!adminKey) {
+      show(adminModal);
+      return;
+    }
+
+    const seconds = clampDurationToMaxSeconds(unitToSeconds(durAmount.value, durUnit.value));
+
+    // This assumes your backend has: POST /api/license/create with JSON { expires_in_seconds }
+    // If yours differs, tell me your route names and I’ll match it exactly.
+    const res = await fetch(`${API_BASE}/api/license/create`, {
+      method: "POST",
+      headers: headersAdmin(),
+      body: JSON.stringify({ expires_in_seconds: seconds })
+    });
+
+    if (res.status === 401) {
+      alert("Admin key rejected (401). Re-enter ADMIN_KEY.");
+      show(adminModal);
+      return;
+    }
+    if (!res.ok) {
+      const t = await res.text().catch(() => "");
+      alert(`Generate failed (${res.status}). ${t}`);
+      return;
+    }
+
+    const data = await res.json().catch(() => null);
+    // expected: { license: "yYUBFbVPzy", id: "...", expires_at: ... }
+    if (!data || !data.license) {
+      alert("Backend did not return a license string.");
+      return;
+    }
+
+    generatedKey.value = data.license;
+    toast("Keys", "Generated");
+  }
+
+  async function copyGeneratedKey() {
+    const v = generatedKey.value;
+    if (!v) return;
+    await navigator.clipboard.writeText(v);
+    toast("Clipboard", "Copied");
+  }
+
+  // ===== Navigation =====
+  function setPage(page) {
+    navItems.forEach(b => b.classList.toggle("active", b.dataset.page === page));
+    if (page === "keys") {
+      hide(pageUsers);
+      show(pageKeys);
+    } else {
+      show(pageUsers);
+      hide(pageKeys);
+    }
+  }
+
+  // ===== Wire up events =====
+  adminSaveBtn?.addEventListener("click", onSaveAdmin);
+  adminModalClose?.addEventListener("click", () => hide(adminModal));
+  logoutBtn?.addEventListener("click", onLogout);
+
+  openGenerateBtn?.addEventListener("click", openGen);
+  genCloseBtn?.addEventListener("click", closeGen);
+  genDoBtn?.addEventListener("click", doGenerate);
+  copyKeyBtn?.addEventListener("click", copyGeneratedKey);
+
+  durAmount?.addEventListener("input", updateDurationPreview);
+  durUnit?.addEventListener("change", updateDurationPreview);
+
+  navItems.forEach(btn => {
+    btn.addEventListener("click", () => setPage(btn.dataset.page));
+  });
+
+  // ===== Startup =====
+  updateDurationPreview();
+
+  // show admin modal if no key saved
+  const saved = getAdminKey();
+  if (!saved) {
+    show(adminModal);
+  } else {
+    hide(adminModal);
+    adminKeyInput.value = saved;
+  }
+
+  // default page
+  setPage("users");
+})();
+</script>
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
