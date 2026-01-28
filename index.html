@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Serotonin — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Inter is very close to the screenshot vibe -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg0:#0b0b0c;
+  --bg1:#0f0f11;
+  --card:#101113;
+  --card2:#0d0e10;
+  --line:rgba(255,255,255,.06);
+  --line2:rgba(255,255,255,.08);
+  --text:#e8e8ea;
+  --muted:rgba(255,255,255,.55);
+  --muted2:rgba(255,255,255,.35);
+  --pill:#1a1b1e;
+  --shadow: 0 12px 40px rgba(0,0,0,.55);
+  --radius:14px;
+  --radius2:18px;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; }
+body{
+  margin:0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--text);
+  background: radial-gradient(1200px 600px at 20% -10%, rgba(255,255,255,.06), transparent 55%),
+              radial-gradient(900px 500px at 80% 0%, rgba(255,255,255,.04), transparent 55%),
+              linear-gradient(180deg, #070708, #0b0b0c 25%, #09090a);
+}
+
+.app{
+  display:flex;
+  height:100%;
+  padding:18px;
+  gap:16px;
+}
+
+.sidebar{
+  width:240px;
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  border:1px solid var(--line);
+  border-radius: var(--radius2);
+  box-shadow: var(--shadow);
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.brand{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:10px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.02);
+  border:1px solid var(--line);
+}
+
+.brandIcon{
+  width:34px;height:34px;
+  border-radius: 10px;
+  display:grid;place-items:center;
+  background: rgba(255,255,255,.03);
+  border:1px solid var(--line);
+  color: rgba(255,255,255,.85);
+}
+
+.brandTitle{ font-weight:600; font-size:13px; }
+.brandSub{ font-size:11px; color: var(--muted2); margin-top:2px; }
+
+.nav{ display:flex; flex-direction:column; gap:8px; }
+.navItem{
+  width:100%;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  padding:10px 12px;
+  border-radius: 12px;
+  background: transparent;
+  border:1px solid transparent;
+  color: rgba(255,255,255,.85);
+  cursor:pointer;
+}
+.navItem:hover{
+  background: rgba(255,255,255,.03);
+  border-color: var(--line);
+}
+.navItem.active{
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.10);
+}
+
+.navDot{ width:18px; opacity:.85; display:inline-grid; place-items:center; }
+
+.sidebarFooter{ margin-top:auto; padding:6px 10px; color: var(--muted2); font-size:11px; }
+
+.main{
+  flex:1;
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+  border:1px solid var(--line);
+  border-radius: var(--radius2);
+  box-shadow: var(--shadow);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+.topbar{
+  height:56px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 18px;
+  background: rgba(0,0,0,.18);
+}
+
+.topCenterTitle{
+  font-weight:600;
+  letter-spacing:.2px;
+  color: rgba(255,255,255,.92);
+}
+
+.topRight{ display:flex; align-items:center; gap:12px; }
+.welcome{ display:flex; align-items:center; gap:8px; font-size:12px; color: rgba(255,255,255,.75); }
+.topLinks{ display:flex; gap:8px; }
+.pill{
+  font-size:12px;
+  padding:6px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.03);
+  border:1px solid var(--line);
+  color: rgba(255,255,255,.75);
+}
+
+.logoutBtn{
+  font-size:12px;
+  padding:7px 10px;
+  border-radius: 10px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+  color: rgba(255,255,255,.8);
+  cursor:pointer;
+}
+.logoutBtn:hover{ background: rgba(255,255,255,.04); }
+
+.page{
+  padding:18px;
+  overflow:auto;
+}
+.pageHeader{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:14px;
+}
+h1{
+  margin:0;
+  font-size:20px;
+  font-weight:600;
+}
+.subtitle{
+  margin:6px 0 0 0;
+  font-size:12px;
+  color: var(--muted2);
+}
+
+.pageActions{ display:flex; gap:10px; align-items:center; }
+
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
+  border:1px solid var(--line);
+  border-radius: var(--radius2);
+  padding:14px;
+  margin-bottom:14px;
+}
+
+.cardTitleRow{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.cardTitle{ font-weight:600; font-size:12px; }
+.cardSub{ font-size:11px; color: var(--muted2); margin-top:3px; }
+
+.searchRow{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.searchBox{
+  flex:1;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  height:40px;
+  padding:0 12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.22);
+  border:1px solid var(--line);
+}
+.searchBox input{
+  flex:1;
+  background: transparent;
+  border:none;
+  outline:none;
+  color: rgba(255,255,255,.85);
+  font-size:12px;
+}
+.searchIcon{ opacity:.7; }
+
+.rightRow{ display:flex; gap:10px; align-items:center; }
+
+.table{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.tableRow{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  padding:12px;
+  border-radius: 12px;
+  background: rgba(0,0,0,.20);
+  border:1px solid var(--line);
+}
+.tableRow.header{
+  background: transparent;
+  border-color: transparent;
+  padding:0 6px 6px 6px;
+  color: var(--muted2);
+  font-size:11px;
+}
+.col{ width:140px; font-size:12px; }
+.col.grow{ flex:1; width:auto; min-width:280px; }
+.col.actions{ width:200px; display:flex; justify-content:flex-end; gap:10px; }
+
+.userCell{ display:flex; gap:10px; align-items:center; }
+.avatar{
+  width:28px;height:28px;
+  border-radius: 999px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  display:grid; place-items:center;
+  color: rgba(255,255,255,.75);
+  text-transform:lowercase;
+  font-size:12px;
+}
+.userName{ font-weight:500; }
+.userMeta{ font-size:11px; margin-top:2px; color: var(--muted2); }
+
+.rolePill{
+  font-size:10px;
+  padding:5px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.03);
+  border:1px solid var(--line);
+  color: rgba(255,255,255,.75);
+}
+
+.tableFooter{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:12px;
+  padding:0 4px;
+}
+.pagination{ display:flex; gap:8px; align-items:center; }
+.pg{
+  font-size:12px;
+  padding:8px 10px;
+  border-radius: 10px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+  color: rgba(255,255,255,.75);
+  cursor:pointer;
+}
+.pg:hover{ background: rgba(255,255,255,.04); }
+.pg.active{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.12); }
+
+.btn{
+  font-size:12px;
+  padding:8px 10px;
+  border-radius: 10px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+  color: rgba(255,255,255,.8);
+  cursor:pointer;
+}
+.btn:hover{ background: rgba(255,255,255,.04); }
+.btn.primary{
+  background: rgba(255,255,255,.07);
+  border-color: rgba(255,255,255,.14);
+}
+.btn.ghost{
+  background: rgba(255,255,255,.02);
+}
+.btn.danger{
+  background: rgba(210,60,70,.18);
+  border-color: rgba(210,60,70,.35);
+  color: rgba(255,255,255,.86);
+}
+.btn.danger:hover{ background: rgba(210,60,70,.24); }
+
+.muted{ color: var(--muted); }
+.small{ font-size:11px; }
+.hidden{ display:none !important; }
+.mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+
+/* MODAL */
+.modalBackdrop{
+  position:fixed; inset:0;
+  background: rgba(0,0,0,.55);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:999;
+}
+
+.modal{
+  width:520px;
+  max-width: calc(100vw - 40px);
+  border-radius: var(--radius2);
+  border:1px solid var(--line);
+  background:
+    radial-gradient(900px 380px at 20% 0%, rgba(255,255,255,.06), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  box-shadow: 0 18px 70px rgba(0,0,0,.75);
+  overflow:hidden;
+}
+
+.modalHeader{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  padding:14px 14px 10px 14px;
+  border-bottom:1px solid var(--line);
+}
+
+.modalTitle{
+  font-weight:600;
+  font-size:13px;
+  color: rgba(255,255,255,.92);
+}
+.modalSub{
+  margin-top:4px;
+  font-size:11px;
+  color: var(--muted2);
+}
+
+.modalClose{
+  width:34px;
+  height:34px;
+  border-radius: 10px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+  color: rgba(255,255,255,.75);
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+}
+.modalClose:hover{ background: rgba(255,255,255,.05); }
+
+.modalBody{
+  padding:14px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.formRow{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.field{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.label{
+  font-size:11px;
+  color: var(--muted2);
+}
+
+.input,
+.select{
+  height:40px;
+  border-radius: 12px;
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.24);
+  color: rgba(255,255,255,.86);
+  padding:0 12px;
+  outline:none;
+  font-size:12px;
+}
+.input:focus,
+.select:focus{
+  border-color: rgba(255,255,255,.14);
+  box-shadow: 0 0 0 3px rgba(255,255,255,.05);
+}
+
+.select{
+  appearance:none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(255,255,255,.55) 50%),
+    linear-gradient(135deg, rgba(255,255,255,.55) 50%, transparent 50%),
+    linear-gradient(to right, transparent, transparent);
+  background-position:
+    calc(100% - 18px) 17px,
+    calc(100% - 13px) 17px,
+    0 0;
+  background-size: 5px 5px, 5px 5px, 100% 100%;
+  background-repeat:no-repeat;
+  padding-right:34px;
+}
+
+.helpText{
+  font-size:11px;
+  color: var(--muted2);
+  line-height:1.35;
+}
+
+.modalFooter{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:12px 14px;
+  border-top:1px solid var(--line);
+  background: rgba(0,0,0,.12);
+}
+
+.modalActions{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+/* TOAST / NOTIFY */
+.toastWrap{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  z-index:1000;
+  pointer-events:none;
+}
+
+.toast{
+  min-width: 260px;
+  max-width: 360px;
+  padding:10px 12px;
+  border-radius: 14px;
+  border:1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  box-shadow: 0 14px 50px rgba(0,0,0,.70);
+  pointer-events:auto;
+}
+
+.toastTitle{
+  font-size:12px;
+  font-weight:600;
+  color: rgba(255,255,255,.92);
+}
+.toastMsg{
+  margin-top:4px;
+  font-size:11px;
+  color: var(--muted2);
+  line-height:1.35;
+}
+
+/* SMALL BADGES / CHIPS */
+.chipRow{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.chip{
+  font-size:11px;
+  padding:6px 10px;
+  border-radius: 999px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+  color: rgba(255,255,255,.75);
+}
+
+/* INLINE ICON BUTTONS (edit/delete) */
+.iconBtn{
+  width:34px;
+  height:34px;
+  border-radius: 10px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+  color: rgba(255,255,255,.78);
+  cursor:pointer;
+  display:grid;
+  place-items:center;
+}
+.iconBtn:hover{ background: rgba(255,255,255,.05); }
+.iconBtn.danger{
+  background: rgba(210,60,70,.16);
+  border-color: rgba(210,60,70,.30);
+  color: rgba(255,255,255,.90);
+}
+.iconBtn.danger:hover{ background: rgba(210,60,70,.22); }
+
+/* KEY DISPLAY */
+.keyBox{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  border-radius: 12px;
+  border:1px solid var(--line);
+  background: rgba(0,0,0,.22);
+}
+
+.keyValue{
+  font-size:12px;
+  color: rgba(255,255,255,.90);
+}
+.keyMeta{
+  font-size:11px;
+  color: var(--muted2);
+  margin-top:3px;
+}
+
+.copyBtn{
+  height:34px;
+  padding:0 10px;
+  border-radius: 10px;
+  border:1px solid var(--line);
+  background: rgba(255,255,255,.02);
+  color: rgba(255,255,255,.78);
+  cursor:pointer;
+}
+.copyBtn:hover{ background: rgba(255,255,255,.05); }
+
+/* SCROLLBARS */
+.page::-webkit-scrollbar,
+.modalBody::-webkit-scrollbar{
+  width: 10px;
+  height: 10px;
+}
+.page::-webkit-scrollbar-thumb,
+.modalBody::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.08);
+  border: 2px solid rgba(0,0,0,.35);
+  border-radius: 999px;
+}
+.page::-webkit-scrollbar-thumb:hover,
+.modalBody::-webkit-scrollbar-thumb:hover{
+  background: rgba(255,255,255,.12);
+}
+.page::-webkit-scrollbar-track,
+.modalBody::-webkit-scrollbar-track{
+  background: rgba(0,0,0,.15);
+  border-radius: 999px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 980px){
+  .app{ padding:12px; }
+  .sidebar{ width:210px; }
+  .col.actions{ width:170px; }
+  .col{ width:120px; }
+  .col.grow{ min-width:200px; }
+}
+
+@media (max-width: 820px){
+  .app{ flex-direction:column; }
+  .sidebar{ width:100%; flex-direction:row; align-items:center; gap:10px; }
+  .nav{ flex-direction:row; gap:10px; }
+  .sidebarFooter{ display:none; }
+  .main{ min-height: calc(100vh - 24px); }
+}
+
+@media (max-width: 560px){
+  .topbar{ padding:0 12px; }
+  .topLinks{ display:none; }
+  .welcome span{ display:none; }
+  .modal{ width: 100%; }
+  .col.actions{ width: auto; }
+  .tableRow{ flex-wrap:wrap; }
+  .col{ width: 48%; }
+  .col.grow{ width: 100%; min-width: 100%; }
+}
+
+</style>
+
+</head>
+<body>
+  <div class="app">
+
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brandIcon">◌</div>
+        <div class="brandText">
+          <div class="brandTitle">Admin Panel</div>
+          <div class="brandSub">Serotonin Administration</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="navItem active" data-page="users">
+          <span class="navDot">👤</span>
+          <span>Users</span>
+        </button>
+        <button class="navItem" data-page="keys">
+          <span class="navDot">🔑</span>
+          <span>Keys</span>
+        </button>
+      </nav>
+
+      <div class="sidebarFooter">
+        <div class="tiny">v1.0</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topCenterTitle">Serotonin</div>
+        <div class="topRight">
+          <div class="welcome">
+            <span class="muted">👤</span>
+            <span id="welcomeText">Welcome, admin</span>
+          </div>
+          <div class="topLinks">
+            <span class="pill">Admin</span>
+            <span class="pill">Dashboard</span>
+          </div>
+          <button class="logoutBtn" id="logoutBtn">Logout</button>
+        </div>
+      </header>
+
+      <!-- PAGE: Users (placeholder to match your screenshot structure) -->
+      <section class="page" id="page-users">
+        <div class="pageHeader">
+          <div>
+            <h1>User Management</h1>
+            <p class="subtitle">Manage user accounts, subscriptions, and product keys</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitleRow">
+            <div>
+              <div class="cardTitle">Search &amp; Filter</div>
+              <div class="cardSub">Find and manage users</div>
+            </div>
+          </div>
+          <div class="searchRow">
+            <div class="searchBox">
+              <span class="searchIcon">🔎</span>
+              <input placeholder="Search by username..." disabled/>
+            </div>
+            <div class="muted small">demo</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitleRow">
+            <div>
+              <div class="cardTitle">Users</div>
+              <div class="cardSub">A list of all users with their roles, subscriptions, and product keys</div>
+            </div>
+          </div>
+
+          <div class="table">
+            <div class="tableRow header">
+              <div class="col grow">User</div>
+              <div class="col">Role</div>
+              <div class="col">Created</div>
+              <div class="col actions">Actions</div>
+            </div>
+
+            <!-- just visual filler to match screenshot vibe -->
+            <div class="tableRow">
+              <div class="col grow">
+                <div class="userCell">
+                  <div class="avatar">u</div>
+                  <div>
+                    <div class="userName">underscore</div>
+                    <div class="userMeta muted">0 subs, 0 keys</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col"><span class="rolePill">USER</span></div>
+              <div class="col muted">Jun 27, 2025</div>
+              <div class="col actions">
+                <button class="btn ghost" disabled>Edit</button>
+                <button class="btn danger" disabled>Delete</button>
+              </div>
+            </div>
+
+            <div class="tableRow">
+              <div class="col grow">
+                <div class="userCell">
+                  <div class="avatar">m</div>
+                  <div>
+                    <div class="userName">MidnighT</div>
+                    <div class="userMeta muted">0 subs, 0 keys</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col"><span class="rolePill">USER</span></div>
+              <div class="col muted">Jun 29, 2025</div>
+              <div class="col actions">
+                <button class="btn ghost" disabled>Edit</button>
+                <button class="btn danger" disabled>Delete</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="tableFooter">
+            <div class="muted small">Showing 1 to 10 of 1811 users</div>
+            <div class="pagination">
+              <button class="pg" disabled>&lt; Previous</button>
+              <button class="pg active" disabled>1</button>
+              <button class="pg" disabled>2</button>
+              <button class="pg" disabled>3</button>
+              <button class="pg" disabled>Next &gt;</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PAGE: Keys (REAL functionality) -->
+      <section class="page hidden" id="page-keys">
+        <div class="pageHeader">
+          <div>
+            <h1>Key Management</h1>
+            <p class="subtitle">Generate, revoke, and view license keys</p>
+          </div>
+          <div class="pageActions">
+            <button class="btn primary" id="openGenerateBtn">Generate Key</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitleRow">
+            <div>
+              <div class="cardTitle">Search</div>
+              <div class="cardSub">Filter by ID (we don’t store plaintext keys)</div>
+            </div>
+          </div>
+          <div class="searchRow">
+            <div class="searchBox">
+              <span class="searchIcon">🔎</span>
+              <input id="keySearch" placeholder="Search by record id (ex: license:abc123)"/>
+            </div>
+
+            <div class="rightRow">
+              <button class="btn ghost" id="refreshKeysBtn">Refresh</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardTitleRow">
+            <div>
+              <div class="cardTitle">Keys</div>
+              <div class="cardSub">License records (plaintext shown only once on creation)</div>
+            </div>
+            <div class="muted small" id="keysCount">—</div>
+          </div>
+
+          <div class="table" id="keysTable">
+            <div class="tableRow header">
+              <div class="col grow">ID</div>
+              <div class="col">Created</div>
+              <div class="col">Expires</div>
+              <div class="col">Status</div>
+              <div class="col actions">Actions</div>
+            </div>
+            <!-- rows injected -->
+          </div>
+
+          <div class="tableFooter">
+            <div class="muted small" id="keysFooterLeft">—</div>
+            <div class="pagination">
+              <button class="pg" id="prevPageBtn">&lt; Previous</button>
+              <button class="pg active" id="pageBtn">1</button>
+              <button class="pg" id="nextPageBtn">Next &gt;</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: Admin Key -->
+  <div class="modalBackdrop" id="adminModal">
+    <div class="modal">
+      <div class="modalHeader">
+        <div>
+          <div class="modalTitle">Admin Authentication</div>
+          <div class="modalSub">Enter your <span class="mono">ADMIN_KEY</span> (stored in localStorage)</div>
+        </div>
+      </div>
+
+      <div class="modalBody">
+        <label class="field">
+          <span>Admin Key</span>
+          <input id="adminKeyInput" placeholder="X-Admin-Key ..." type="password"/>
+        </label>
+      </div>
+
+      <div class="modalFooter">
+        <button class="btn ghost" id="adminModalClose">Close</button>
+        <button class="btn primary" id="adminSaveBtn">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: Generate Key -->
+  <div class="modalBackdrop hidden" id="genModal">
+    <div class="modal wide">
+      <div class="modalHeader">
+        <div>
+          <div class="modalTitle">Generate License Key</div>
+          <div class="modalSub">Choose an expiration duration (1 second → 10 years)</div>
+        </div>
+      </div>
+
+      <div class="modalBody grid2">
+        <label class="field">
+          <span>Amount</span>
+          <input id="durAmount" type="number" min="1" value="30"/>
+        </label>
+
+        <label class="field">
+          <span>Unit</span>
+          <select id="durUnit">
+            <option value="seconds">Seconds</option>
+            <option value="minutes">Minutes</option>
+            <option value="hours" selected>Hours</option>
+            <option value="days">Days</option>
+            <option value="months">Months (30d)</option>
+            <option value="years">Years (365d)</option>
+          </select>
+        </label>
+
+        <div class="hintBox">
+          <div class="hintTitle">Preview</div>
+          <div class="hintSub muted" id="durPreview">—</div>
+          <div class="hintSub muted small">Max: 10 years</div>
+        </div>
+
+        <div class="hintBox">
+          <div class="hintTitle">Result</div>
+          <div class="hintSub muted small">Plaintext key will appear once after generation.</div>
+        </div>
+
+        <label class="field full">
+          <span>Generated Key</span>
+          <div class="copyRow">
+            <input id="generatedKey" class="mono" readonly placeholder="Click Generate..."/>
+            <button class="btn ghost" id="copyKeyBtn">Copy</button>
+          </div>
+        </label>
+      </div>
+
+      <div class="modalFooter">
+        <button class="btn ghost" id="genCloseBtn">Close</button>
+        <button class="btn primary" id="genDoBtn">Generate</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
