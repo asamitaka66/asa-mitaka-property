@@ -178,7 +178,7 @@
     const res = await fetch(`${API_BASE}/api/license/create`, {
       method: "POST",
       headers: headersAdmin(),
-      body: JSON.stringify({ expires_in_seconds: seconds })
+      body: JSON.stringify({ duration_seconds: seconds })
     });
 
     if (res.status === 401) {
